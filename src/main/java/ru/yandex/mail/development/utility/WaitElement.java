@@ -15,6 +15,11 @@ public class WaitElement {
                 .until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
+    public static WebElement waitElementVisible(WebDriver driver, WebElement element) {
+        return new WebDriverWait(driver, Duration.ofSeconds(Long.parseLong(System.getProperty("explicit_wait"))))
+                .until(ExpectedConditions.visibilityOf(element));
+    }
+
     public static WebElement waitElementPresent(WebDriver driver, By locator) {
         return new WebDriverWait(driver, Duration.ofSeconds(Long.parseLong(System.getProperty("explicit_wait"))))
                 .until(ExpectedConditions.presenceOfElementLocated(locator));
