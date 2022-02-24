@@ -1,9 +1,10 @@
 package ru.yandex.mail.development.pages;
 
 import io.qameta.allure.Step;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import ru.yandex.mail.development.utility.WaitElement;
 
 import java.util.stream.Collectors;
@@ -11,37 +12,41 @@ import java.util.stream.Collectors;
 public class LoginWidgetPage {
 
     private final WebDriver driver;
-    private final WebElement loginBtn;
     private final String windowHandle;
-    private final By loginLocator = By.xpath("//div[text()='Войти']");
-    private final By incomingMailFolderLocator = By.xpath("//span[text()='Входящие']/parent::div");
-    private final By loggedUserLocator = By.xpath("//span[starts-with(@class,'username ')]");
-    private final By mailLocator = By.xpath("//div[text()='Почта']");
+    @FindBy(xpath = "//div[text()='Войти']")
+    WebElement loginBtn;
+    @FindBy(xpath = "//span[text()='Входящие']/parent::div")
+    WebElement incomingMailFolderLocator;
+    @FindBy(xpath = "//span[starts-with(@class,'username ')]")
+    WebElement loggedUserLocator;
+    @FindBy(xpath = "//div[text()='Почта']")
+    WebElement mailLocator;
 
     public LoginWidgetPage(WebDriver driver) {
         this.driver = driver;
         windowHandle = driver.getWindowHandle();
-        loginBtn = WaitElement.waitElementVisible(driver, loginLocator);
+        PageFactory.initElements(driver, this);
     }
 
     @Step("Вход в личный кабинет")
-    public void doLogin() {
+    public LoginPage doLogin() {
         loginBtn.click();
+        return new LoginPage(driver);
     }
 
     @Step("Проверка почты")
-    public String checkMail() {
-        WaitElement.waitElementVisible(driver, mailLocator).click();
+    public MailPage checkMail() {
+        mailLocator.click();
         String newWndHandle;
         newWndHandle = driver.getWindowHandles().stream().filter(h -> !h.equals(windowHandle)).
                 collect(Collectors.toList()).get(0);
         driver.switchTo().window(newWndHandle);
         WaitElement.waitElementVisible(driver, incomingMailFolderLocator);
 
-        return newWndHandle;
+        return new MailPage(driver);
     }
 
     public String getLoggedUserName() {
-        return WaitElement.waitElementVisible(driver, loggedUserLocator).getText();
+        return loggedUserLocator.getText();
     }
 }
