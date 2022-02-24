@@ -18,18 +18,16 @@ public class MailTests extends ChromeTestsConfiguration {
         driver.get(System.getProperty("host_url"));
 
         LoginWidgetPage loginWidget = new LoginWidgetPage(driver);
-        loginWidget.doLogin();
-        LoginPage loginPage = new LoginPage(driver);
+        LoginPage loginPage = loginWidget.doLogin();
         loginPage.loginValidCredentials(Config.getProperty("userID"), Config.getProperty("userPassword"));
 
         assertEquals(Config.getProperty("userID"), loginWidget.getLoggedUserName(),
                 "Значение в поле залогированного пользователя не совпадает с ID пользователя.");
 
-        loginWidget.checkMail();
-        MailPage mailPage = new MailPage(driver);
-//        int currentMailCount = mailPage.getIncomingMailCount();
+        MailPage mailPage = loginWidget.checkMail();
+        int currentMailCount = mailPage.getIncomingMailCount();
         mailPage.sendNewMail(Config.getProperty("userMail"), "Simbirsoft theme");
-//        assertEquals(currentMailCount + 1, mailPage.getIncomingMailCount(),
-//                "Количество входящих писем не соответствует ожидаемому.");
+        assertEquals(currentMailCount + 1, mailPage.getIncomingMailCount(),
+                "Количество входящих писем не соответствует ожидаемому.");
     }
 }
